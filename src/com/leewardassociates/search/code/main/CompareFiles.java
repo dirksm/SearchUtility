@@ -58,6 +58,7 @@ public class CompareFiles {
 			}
 		}
 	}
+	
 
 	private static void processInputs(String[] args) {
 		List<String> options = new ArrayList<String>();

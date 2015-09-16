@@ -1,0 +1,32 @@
+<project name="SearchUtility" default="newSync" basedir=".">
+	
+	<property name="foo" value="./bin/"/>
+	<property name="bar" value="C:\\security-test\\deploy\\"/>
+
+	<macrodef name="syncContents">
+	    <attribute name="from"/>
+	    <attribute name="to"/>
+	    <sequential>
+	        <echo>syncContents     : @{from} -> @{to}</echo>
+	        <fileset id="selectCopyFiles" dir="@{from}">
+	            <different targetdir="@{to}"
+	             ignoreFileTimes="true"/>
+	        </fileset>
+	        <fileset id="selectDeleteFiles" dir="@{to}">
+	            <present present="srconly" targetdir="@{from}"/>
+	        </fileset>
+
+	        <copy overwrite="true" todir="@{to}" preservelastmodified="true" verbose="true">
+	            <fileset refid="selectCopyFiles"/>
+	        </copy>
+	        <delete includeEmptyDirs="true" verbose="true">
+	            <fileset refid="selectDeleteFiles"/>
+	        </delete>
+	        <echo>End syncContents : @{from} -> @{to}</echo>
+	    </sequential>
+	</macrodef>
+	
+	<target name="newSync">
+	    <syncContents from="${foo}" to="${bar}"/>
+	</target>
+</project>

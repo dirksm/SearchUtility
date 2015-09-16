@@ -89,6 +89,12 @@ public class SearchWorkspace {
 				root = phase2Root;
 				searchWorkspace(new File(root).listFiles());
 			}
+			String foundFileName = "FoundFileTables_"+DateUtil.format(new Date(), "MM_dd_yyyy_kk_mm_ss_S")+".csv";
+			File foundout = new File(outputFilePath+"\\\\"+foundFileName);
+			for (String table : found) {
+				FileIO.writeFile(foundout, table+"\n");
+			}
+
 			List<String> missing = new ArrayList<String>();
 			for (String table : searchList) {
 				if (!found.contains(table)) {
@@ -122,6 +128,7 @@ public class SearchWorkspace {
 		}
 	}
 	
+
 	/**
 	 * Iterates through the list of files and directories.  If it is in the project and the right file type, searches the file for search param.
 	 *
