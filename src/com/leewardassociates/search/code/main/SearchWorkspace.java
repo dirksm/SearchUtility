@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.leewardassociates.search.code.util.DateUtil;
 import com.leewardassociates.search.code.util.FileIO;
+import com.leewardassociates.search.code.util.FileSearchUtil;
 
 
 
@@ -84,13 +85,15 @@ public class SearchWorkspace {
 		processInputs(args);
 		
 		try {
-			searchWorkspace(new File(root).listFiles());
+			FileSearchUtil fsu = new FileSearchUtil(root, searchWorkspace, caseSensitive, found, searchList, ignoreList, projectList, fileList);
+			fsu.searchWorkspace(new File(root).listFiles(), inputFile);
 			if (searchAllCode) {
 				root = phase2Root;
-				searchWorkspace(new File(root).listFiles());
+				fsu.searchWorkspace(new File(root).listFiles(), inputFile);
 			}
 			String foundFileName = "FoundFileTables_"+DateUtil.format(new Date(), "MM_dd_yyyy_kk_mm_ss_S")+".csv";
 			File foundout = new File(outputFilePath+"\\\\"+foundFileName);
+			found = fsu.getFound();
 			for (String table : found) {
 				FileIO.writeFile(foundout, table+"\n");
 			}
@@ -115,92 +118,6 @@ public class SearchWorkspace {
 		
 	}
 	
-	/**
-	 * Called by the main method.  Builds the search list and grabs the files to traverse.
-	 *
-	 * @param files the files
-	 * @throws Exception the exception
-	 */
-	public static void searchWorkspace(File[] files) throws Exception {
-		searchList = FileIO.parseFile(new File(inputFile));
-		for (String search : searchList) {
-			showFiles(files, search);
-		}
-	}
-	
-
-	/**
-	 * Iterates through the list of files and directories.  If it is in the project and the right file type, searches the file for search param.
-	 *
-	 * @param files the files
-	 * @param param the param
-	 * @throws Exception the exception
-	 */
-	public static void showFiles(File[] files, String param) throws Exception {
-		for (File file : files) {
-			if (file.isDirectory()) {
-				if (isInProject(file.getCanonicalPath()) && !ignoreList.contains(file.getName())) {
-					showFiles(file.listFiles(), param);
-				}
-			} else {
-				if (matchesFileType(file.getName())) {
-					FileIO.searchFile(file, param, caseSensitive, found);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Determines if the file is in a project specified.
-	 *
-	 * @param fileName the file name
-	 * @return true, if is in project
-	 */
-	private static boolean isInProject(String fileName) {
-		boolean inProj = searchWorkspace?true:false;
-		if (!searchWorkspace) {
-			for (String projectName : projectList) {
-				if (StringUtils.isNotBlank(fileName) &&  fileName.startsWith(projectName)) {
-					inProj = true;
-					break;
-				}
-			}
-		}
-		return inProj;
-	}
-	
-	/**
-	 * Determines if the file is one of the file types specified in the fileList.
-	 *
-	 * @param fileName the file name
-	 * @return true, if successful
-	 */
-	private static boolean matchesFileType(String fileName) {
-		boolean inFile = false;
-		for (String file : fileList) {
-			if (StringUtils.isNotBlank(fileName) &&  fileName.endsWith(file)) {
-				inFile = true;
-				break;
-			}
-		}
-		return inFile;
-	}
-	
-	/**
-	 * Retrieves the package name for the file (if it is a java file).
-	 *
-	 * @param text2search the text2search
-	 * @return the package
-	 */
-	private static String getPackage(String text2search) {
-		String text = "";
-		Pattern pattern = Pattern.compile("^package\\s?(.*?);");
-		Matcher m = pattern.matcher(text2search);
-		if (m.find()) {
-			text = m.group(1);
-		}
-		return text;
-	}
 
 	/**
 	 *  

@@ -1,28 +1,57 @@
 package com.leewardassociates.search.code.main;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.search.IJavaSearchConstants;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.jdt.core.search.SearchParticipant;
-import org.eclipse.jdt.core.search.SearchPattern;
-import org.eclipse.jdt.core.search.SearchRequestor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.leewardassociates.search.code.util.WorkspaceSearchRequestor;
+import com.leewardassociates.search.services.SearchReferenceService;
 
 public class WorkspaceSearchTool {
 
+	private static Logger log = LoggerFactory.getLogger(WorkspaceSearchTool.class);
+
 	public static void main(String[] args) {
-		SearchPattern pattern = SearchPattern.createPattern("gov.state.uim.app.struts.AddEmployerInfoAction", IJavaSearchConstants.TYPE, IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH);
-		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
-		SearchRequestor request = new WorkspaceSearchRequestor();
-		SearchEngine engine = new SearchEngine();
+		log.error("Process started...");
+		long start = System.currentTimeMillis();
+		SearchReferenceService srs = new SearchReferenceService(args);
 		try {
-			engine.search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, scope, request, null);
-		} catch (CoreException e) {
-			e.printStackTrace();
+			srs.execute();
+		} catch (Exception e) {
+			log.error("Exception in main: "+e.getMessage(), e);
+		} finally {
+			log.error("Execution complete. Process took " + getTimePeriod((System.currentTimeMillis()-start)) + " to complete.");
+			System.exit(0);
 		}
-		
+	}
+	
+	public static String getTimePeriod(long milliseconds) {
+		String retTime = "";
+		if (milliseconds > 3600000) {
+			int hours = getHours(milliseconds);
+			int mins = getMinutes(milliseconds%3600000);
+			int secs = getSeconds((milliseconds%3600000)%60000);
+			retTime = hours + (hours==1?" hour, ":" hours, ") + (mins==1?(mins+" minute, "):(mins + " minutes, ")) + (secs==1?(secs+" second"):(secs+" seconds"));
+		} else if (milliseconds > 60000) {
+			int mins = getMinutes(milliseconds);
+			int secs = getSeconds(milliseconds%60000);
+			retTime = (mins==1?(mins+" minute, "):(mins + " minutes, ")) + (secs==1?(secs+" second"):(secs+" seconds"));
+		} else if (milliseconds > 1000) {
+			int secs = getSeconds(milliseconds);
+			retTime = secs==1?(secs+" second"):(secs+" seconds");
+		} else {
+			retTime = milliseconds + " ms";
+		}
+		return retTime;
+	}
+	
+	private static int getHours(long milliseconds) {
+		return (int)milliseconds/3600000;
 	}
 
+	private static int getMinutes(long milliseconds) {
+		return (int)milliseconds/60000;
+	}
+	
+	private static int getSeconds(long milliseconds) {
+		return (int)milliseconds/1000;
+	}
 }
