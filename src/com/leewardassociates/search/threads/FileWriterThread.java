@@ -78,7 +78,7 @@ public class FileWriterThread implements Runnable {
 			String line = null;
 			while (!this.closed) {
 				if((line = this.buffer.poll()) != null) {
-					this.write(line);
+					this.write(line+"\n");
 				}
 			}
 			log.info("Thread is closed. Finishing writing buffer to file.  Size: " + this.buffer.size());
