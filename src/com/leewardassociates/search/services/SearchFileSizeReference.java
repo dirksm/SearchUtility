@@ -18,13 +18,15 @@ import org.slf4j.LoggerFactory;
 import com.leewardassociates.search.code.util.DateUtil;
 import com.leewardassociates.search.constants.AppConstants;
 import com.leewardassociates.search.models.ParamModel;
+import com.leewardassociates.search.threads.FileSizeProducer;
+import com.leewardassociates.search.threads.FileSizeSearchThread;
 import com.leewardassociates.search.threads.FileWriterThread;
 import com.leewardassociates.search.threads.ReferenceProducer;
 import com.leewardassociates.search.threads.ReferenceSearchThread;
 
-public class SearchReferenceService {
+public class SearchFileSizeReference {
 
-	private static Logger log = LoggerFactory.getLogger(SearchReferenceService.class);
+	private static Logger log = LoggerFactory.getLogger(SearchFileSizeReference.class);
 	
 
 	private int threadCount = 0;
@@ -34,12 +36,12 @@ public class SearchReferenceService {
 	FileWriterThread fw = null;
 	Thread t = null;
 	
-	private SearchReferenceService() {
+	private SearchFileSizeReference() {
 		params = new ParamModel();
 		threadCount = 20;
 	}
 	
-	public SearchReferenceService(String[] args) {
+	public SearchFileSizeReference(String[] args) {
 		this();
 
 		/**
@@ -56,7 +58,7 @@ public class SearchReferenceService {
 
 		try {
 			
-			String fileName = "Objects_Not_Ref_"+(params.getRoot().endsWith("PHASE1")?"PHASE1_":params.getRoot().endsWith("PHASE2")?"PHASE2_":"")+DateUtil.format(new Date(), "MM_dd_yyyy_kk_mm_ss_S")+".csv";
+			String fileName = "Empty_Objects_"+(params.isSearchAllCode()?"":params.getRoot().endsWith("PHASE1")?"PHASE1_":params.getRoot().endsWith("PHASE2")?"PHASE2_":"")+DateUtil.format(new Date(), "MM_dd_yyyy_kk_mm_ss_S")+".csv";
 			target = new FileOutputStream(new File(params.getOutputFilePath()+"\\\\"+fileName));
 
 			// Set up file writer
@@ -68,11 +70,11 @@ public class SearchReferenceService {
 			
 			// Submit thread to populate the java classes
 			ExecutorService fillES = Executors.newFixedThreadPool(1);
-			fillES.submit(new ReferenceProducer(inqueue, params));
+			fillES.submit(new FileSizeProducer(inqueue, params));
 			
 			ExecutorService es = Executors.newFixedThreadPool(threadCount);
 			for (int i = 0; i < threadCount; i++) {
-				es.submit(new ReferenceSearchThread(inqueue, fw, params));
+				es.submit(new FileSizeSearchThread(inqueue, fw, params));
 			}
 			
 			t.start();
@@ -97,7 +99,7 @@ public class SearchReferenceService {
 			
 			
 		} catch (Exception e) {
-			log.error("Exception executing SearchReferenceService: " + e.getMessage(), e);
+			log.error("Exception executing SearchFileSizeService: " + e.getMessage(), e);
 		} finally {
 			try {
 				if (fw != null) {
@@ -158,5 +160,6 @@ public class SearchReferenceService {
 		}
 	}
 
+	
 
 }

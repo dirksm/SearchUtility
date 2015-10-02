@@ -15,43 +15,21 @@ import com.leewardassociates.search.code.util.FileIO;
 import com.leewardassociates.search.constants.AppConstants;
 import com.leewardassociates.search.models.ParamModel;
 
-public class SearchProducerThread implements Runnable {
+public abstract class SearchProducerThread implements Runnable {
 
-	private static Logger log = LoggerFactory.getLogger(SearchProducerThread.class);
-	
+	/** The file list. */
+	protected List<String> fileList;
+
 	/** The project list. */
-	public  List<String> projectList = Arrays.asList(new String[]{"\\Benefits","\\Framework","\\Tax"});
+	protected List<String> projectList = Arrays.asList(new String[]{"\\Benefits","\\Framework","\\Tax"});
 	
 	/** The ignore list. */
-	public static List<String> ignoreList = Arrays.asList(new String[]{".metadata",".svn", "build","lib","bin","target","deploy","config","xdocletmerge","dist","dist-framework","javasource"});
+	protected List<String> ignoreList = Arrays.asList(new String[]{".metadata",".svn", "build","lib","bin","target","deploy","config","xdocletmerge","dist","dist-framework","javasource"});
 
-	private ArrayBlockingQueue<String> queue = null;
-	private ParamModel params = null;
+	protected ArrayBlockingQueue<String> queue = null;
+	protected ParamModel params = null;
 	
-	private SearchProducerThread() {
-		
-	}
-	
-	public SearchProducerThread(ArrayBlockingQueue<String> q, ParamModel params) {
-		this();
-		this.queue = q;
-		this.params = params;
-	}
-	
-	public void traverseFiles(File[] files) throws Exception {
-		List<String> list = new ArrayList<String>();
-		for (File file : files) {
-			if (file.isDirectory()) {
-				if (isInProject(file.getCanonicalPath()) && !ignoreList.contains(file.getName())) {
-					traverseFiles(file.listFiles());
-				}
-			} else {
-				if (StringUtils.isNotBlank(file.getName()) &&  file.getName().endsWith(".java")) {
-					queue.offer(FileIO.getFullyQualifiedName(file), 365, TimeUnit.DAYS);
-				}
-			}
-		}
-	}
+	public abstract void traverseFiles(File[] files) throws Exception;
 	
 	/**
 	 * Determines if the file is in a project specified.
@@ -59,7 +37,7 @@ public class SearchProducerThread implements Runnable {
 	 * @param fileName the file name
 	 * @return true, if is in project
 	 */
-	private boolean isInProject(String fileName) {
+	protected boolean isInProject(String fileName) {
 		boolean inProj = params.isSearchWorkspace()?true:false;
 		if (!params.isSearchWorkspace()) {
 			for (String projectName : projectList) {
@@ -72,9 +50,25 @@ public class SearchProducerThread implements Runnable {
 		return inProj;
 	}
 
-	
-	@Override
-	public void run() {
+	/**
+	 * Determines if the file is one of the file types specified in the fileList.
+	 *
+	 * @param fileName the file name
+	 * @return true, if successful
+	 */
+	protected boolean matchesFileType(String fileName) {
+		boolean inFile = false;
+		for (String file : fileList) {
+			if (StringUtils.isNotBlank(fileName) &&  fileName.endsWith(file)) {
+				inFile = true;
+				break;
+			}
+		}
+		return inFile;
+	}
+
+
+	protected void process(Logger log)  {
 		try {
 		
 			traverseFiles(new File(params.getRoot()).listFiles());
