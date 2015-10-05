@@ -75,9 +75,17 @@ public abstract class SearchThread implements Runnable {
 		boolean inProj = params.isSearchWorkspace()?true:false;
 		if (!params.isSearchWorkspace()) {
 			for (String projectName : projectList) {
-				if (StringUtils.isNotBlank(fileName) &&  fileName.startsWith(params.getRoot()+projectName)) {
-					inProj = true;
-					break;
+				if (StringUtils.isNotBlank(fileName)) {
+					if (params.isSearchAllCode()) {
+						 if(fileName.startsWith(params.getRoot()+projectName) ||
+							fileName.startsWith(params.getPhase2Root()+projectName)) {
+								inProj = true;
+								break;
+						 }
+					} else if (fileName.startsWith(params.getRoot()+projectName)) {
+						inProj = true;
+						break;
+					}
 				}
 			}
 		}

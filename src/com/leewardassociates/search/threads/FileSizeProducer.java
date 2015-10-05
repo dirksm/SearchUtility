@@ -39,7 +39,7 @@ public class FileSizeProducer extends SearchProducerThread {
 					traverseFiles(file.listFiles());
 				}
 			} else {
-				if (StringUtils.isNotBlank(file.getName()) &&  matchesFileType(file.getName())) {
+				if (StringUtils.isNotBlank(file.getName())) {
 					queue.offer(file.getCanonicalPath(), 365, TimeUnit.DAYS);
 				}
 			}

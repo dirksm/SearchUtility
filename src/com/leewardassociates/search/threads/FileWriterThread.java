@@ -35,10 +35,10 @@ public class FileWriterThread implements Runnable {
     
     public synchronized void addBuffer(String str) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug("Adding to buffer.  size is " + this.buffer.size());
+            log.debug("Adding " + str + " to buffer.  size is " + this.buffer.size());
         }
         if (!this.closed) {
-            if (log.isDebugEnabled() && ++addcounter % 10000 == 0) {
+            if (log.isDebugEnabled() && ++addcounter % 100 == 0) {
                 log.debug("Added " + addcounter + " records to writer buffer.  buffer size is " + buffer.size());
             }
             try {
@@ -64,7 +64,7 @@ public class FileWriterThread implements Runnable {
 
     private void write(String str) throws IOException {
         target.write(str.getBytes());
-        if (log.isDebugEnabled() && ++counter % 5000 == 0) {
+        if (log.isDebugEnabled() && ++counter % 50 == 0) {
             log.debug("wrote " + counter + " xml records to file. Buffer size: " + buffer.size());
         }
     }

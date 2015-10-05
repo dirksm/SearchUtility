@@ -10,7 +10,7 @@ public class SearchEmptyFiles {
 	private static Logger log = LoggerFactory.getLogger(SearchEmptyFiles.class);
 
 	public static void main(String[] args) {
-		log.error("Process started...");
+		log.info("Process started...");
 		long start = System.currentTimeMillis();
 		SearchFileSizeReference sfsr = new SearchFileSizeReference(args);
 		try {
@@ -18,7 +18,7 @@ public class SearchEmptyFiles {
 		} catch (Exception e) {
 			log.error("Exception in main: "+e.getMessage(), e);
 		} finally {
-			log.error("Execution complete. Process took " + getTimePeriod((System.currentTimeMillis()-start)) + " to complete.");
+			log.info("Execution complete. Process took " + getTimePeriod((System.currentTimeMillis()-start)) + " to complete.");
 			System.exit(0);
 		}
 	}
