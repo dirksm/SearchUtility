@@ -175,6 +175,14 @@ public class FileIO {
 		return name;
 	}
 	
+	public static String getJavaFileName(File file) {
+		String name = "";
+		if (file.getName().endsWith(".java")) {
+			name = file.getName().substring(0, file.getName().indexOf(".java"));
+		}
+		return name;
+	}
+	
 	/**
 	 * Retrieves the package name for the file (if it is a java file).
 	 *
