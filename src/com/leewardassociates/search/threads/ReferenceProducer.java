@@ -34,7 +34,7 @@ public class ReferenceProducer extends SearchProducerThread {
 				}
 			} else {
 				if (StringUtils.isNotBlank(file.getName()) &&  file.getName().endsWith(".java")) {
-					queue.offer(FileIO.getJavaFileName(file), 365, TimeUnit.DAYS);
+					queue.offer(FileIO.getFullyQualifiedName(file), 365, TimeUnit.DAYS);
 				}
 			}
 		}

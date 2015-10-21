@@ -8,6 +8,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
+import com.leewardassociates.search.code.util.FileIO;
 import com.leewardassociates.search.constants.AppConstants;
 import com.leewardassociates.search.models.ParamModel;
 
@@ -92,6 +93,10 @@ public abstract class SearchThread implements Runnable {
 		return inProj;
 	}
 
+	protected boolean isSameFile(File file, String param) {
+		String f = FileIO.getFullyQualifiedName(file);
+		return StringUtils.isNotBlank(f) && StringUtils.isNotBlank(param) && f.equals(param);
+	}
 	
 	protected abstract void search(File[] files, String param, FileWriterThread fw)  throws Exception;
 }

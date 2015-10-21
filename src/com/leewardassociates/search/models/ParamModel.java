@@ -22,7 +22,7 @@ public class ParamModel implements Serializable {
 	private String phase1Root = "C:\\Workspaces\\UIM-PHASE1";
 	
 	/** The phase2 root. */
-	private String phase2Root = "C:\\Workspaces\\UIM-PHASE2";
+	private String phase2Root = "C:\\Workspaces\\UIM-PHASE2Code";
 
 	public String outputFilePath = "C:\\Users\\Public\\Documents\\";
 

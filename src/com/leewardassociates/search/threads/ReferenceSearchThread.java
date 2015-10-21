@@ -18,7 +18,7 @@ public class ReferenceSearchThread extends SearchThread {
 	
 	
 	private ReferenceSearchThread() {
-		fileList = Arrays.asList(new String[]{".java", ".xml"});
+		fileList = Arrays.asList(new String[]{".java", ".xml", ".tld", ".jsp"});
 	}
 	
 	public ReferenceSearchThread(ArrayBlockingQueue<String> q, FileWriterThread fw, ParamModel params) {
@@ -41,7 +41,7 @@ public class ReferenceSearchThread extends SearchThread {
 						if (!ignoreList.contains(file.getName())) {
 							found = showFiles(file.listFiles(), param);
 						}
-					} else if (matchesFileType(file.getName()) && FileIO.searchReference(file, param, params.isCaseSensitive())) {
+					} else if (matchesFileType(file.getName()) && !isSameFile(file, param) && FileIO.searchReference(file, FileIO.getJavaFileName(param), params.isCaseSensitive())) {
 						log.info(param + " was referenced in " + file.getCanonicalPath()+".");
 						found = true;
 						break;
